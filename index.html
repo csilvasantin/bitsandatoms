@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bits & Atoms — AI + IoT Education</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Variables ───────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #060810;
+      --bg2:       #0c0f1a;
+      --surface:   rgba(255,255,255,.04);
+      --border:    rgba(255,255,255,.08);
+      --accent:    #6c63ff;
+      --accent2:   #00d4aa;
+      --accent3:   #ff6b6b;
+      --text:      #e8eaf0;
+      --muted:     #6b7280;
+      --font:      'Inter', sans-serif;
+      --font2:     'Space Grotesk', sans-serif;
+      --radius:    16px;
+      --transition: .3s cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    ::selection { background: var(--accent); color: #fff; }
+
+    /* ─── Scrollbar ───────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+    /* ─── Noise Overlay ───────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.04'/%3E%3C/svg%3E");
+      opacity: .4;
+    }
+
+    /* ─── Navigation ──────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 3rem;
+      border-bottom: 1px solid transparent;
+      transition: var(--transition);
+    }
+    nav.scrolled {
+      background: rgba(6,8,16,.85);
+      border-color: var(--border);
+      backdrop-filter: blur(20px);
+    }
+
+    .nav-logo {
+      font-family: var(--font2);
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--text);
+      text-decoration: none;
+      display: flex; align-items: center; gap: .5rem;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted); font-size: .9rem;
+      text-decoration: none; font-weight: 500;
+      transition: color var(--transition);
+      letter-spacing: .02em;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent); color: #fff !important;
+      padding: .55rem 1.3rem; border-radius: 100px;
+      font-weight: 600 !important; font-size: .85rem !important;
+    }
+    .nav-cta:hover { background: #7c73ff; color: #fff !important; }
+
+    /* ─── Hamburger ───────────────────────────────────────── */
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px; cursor: pointer;
+      background: none; border: none; padding: .3rem;
+    }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: var(--text); border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    /* ─── Hero ────────────────────────────────────────────── */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      overflow: hidden; padding: 6rem 3rem 4rem;
+    }
+
+    /* Animated gradient orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); opacity: .25; pointer-events: none;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: var(--accent); top: -10%; left: -5%; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: var(--accent2); bottom: -10%; right: -5%; animation-delay: -3s; }
+    .orb-3 { width: 300px; height: 300px; background: var(--accent3); top: 40%; left: 50%; animation-delay: -5s; }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(20px, -30px) scale(1.05); }
+      66%       { transform: translate(-15px, 15px) scale(.95); }
+    }
+
+    /* Grid lines background */
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(108,99,255,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,99,255,.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+    }
+
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 800px;
+    }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(108,99,255,.12); border: 1px solid rgba(108,99,255,.3);
+      color: #a8a4ff; font-size: .78rem; font-weight: 600;
+      padding: .4rem 1rem; border-radius: 100px;
+      letter-spacing: .08em; text-transform: uppercase;
+      margin-bottom: 1.8rem;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(1.5); }
+    }
+
+    .hero-title {
+      font-family: var(--font2);
+      font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700; line-height: 1.1;
+      margin-bottom: 1.5rem; letter-spacing: -.02em;
+    }
+    .hero-title .gradient {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 1.15rem; color: var(--muted); max-width: 560px;
+      margin-bottom: 2.5rem; line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+    }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: linear-gradient(135deg, var(--accent), #8b83ff);
+      color: #fff; font-weight: 600; font-size: .95rem;
+      padding: .85rem 2rem; border-radius: 100px;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: var(--transition); box-shadow: 0 0 30px rgba(108,99,255,.4);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(108,99,255,.6); }
+
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: .5rem;
+      color: var(--text); font-weight: 500; font-size: .95rem;
+      padding: .85rem 2rem; border-radius: 100px;
+      text-decoration: none; border: 1px solid var(--border);
+      background: var(--surface);
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.07); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem;
+      flex-wrap: wrap;
+    }
+    .stat { }
+    .stat-num {
+      font-family: var(--font2); font-size: 2.2rem; font-weight: 700;
+      background: linear-gradient(135deg, #fff, var(--muted));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: .8rem; color: var(--muted); font-weight: 500; letter-spacing: .04em; }
+
+    /* ─── Section Base ────────────────────────────────────── */
+    section { padding: 7rem 3rem; position: relative; }
+
+    .section-header { text-align: center; margin-bottom: 4rem; }
+    .section-tag {
+      display: inline-block;
+      color: var(--accent); font-size: .75rem; font-weight: 600;
+      letter-spacing: .12em; text-transform: uppercase;
+      margin-bottom: .8rem;
+    }
+    .section-title {
+      font-family: var(--font2); font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; line-height: 1.2; margin-bottom: 1rem;
+      letter-spacing: -.02em;
+    }
+    .section-desc { color: var(--muted); max-width: 540px; margin: 0 auto; font-size: 1rem; }
+
+    /* ─── About ───────────────────────────────────────────── */
+    #about { background: var(--bg2); }
+
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+      align-items: center; max-width: 1100px; margin: 0 auto;
+    }
+
+    .about-visual {
+      position: relative;
+    }
+    .about-visual-inner {
+      aspect-ratio: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem;
+      position: relative; overflow: hidden;
+    }
+    .about-visual-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: conic-gradient(from 180deg, var(--accent), var(--accent2), var(--accent3), var(--accent));
+      opacity: .12; animation: spin 8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .about-badge-card {
+      position: absolute; bottom: -1rem; right: -1.5rem;
+      background: rgba(12,15,26,.9);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.4rem;
+      backdrop-filter: blur(20px);
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .about-badge-icon { font-size: 1.5rem; }
+    .about-badge-text { font-size: .85rem; font-weight: 600; }
+    .about-badge-sub { font-size: .72rem; color: var(--muted); }
+
+    .about-content { }
+    .about-lead {
+      font-size: 1.2rem; font-weight: 500; line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .about-body { color: var(--muted); line-height: 1.75; margin-bottom: 2rem; }
+
+    .value-pills {
+      display: flex; flex-wrap: wrap; gap: .6rem;
+    }
+    .pill {
+      padding: .45rem 1rem; border-radius: 100px;
+      border: 1px solid var(--border); background: var(--surface);
+      font-size: .82rem; font-weight: 500; color: var(--text);
+      transition: var(--transition);
+    }
+    .pill:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── Program ─────────────────────────────────────────── */
+    #program { }
+
+    .program-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    .program-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      transition: var(--transition); position: relative; overflow: hidden;
+      cursor: default;
+    }
+    .program-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--card-glow, var(--accent));
+      opacity: 0; transition: opacity var(--transition);
+      mask: radial-gradient(200px at var(--mx,50%) var(--my,50%), black, transparent);
+    }
+    .program-card:hover { border-color: rgba(255,255,255,.15); transform: translateY(-4px); }
+    .program-card:hover::before { opacity: .06; }
+
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1.2rem;
+      background: var(--icon-bg);
+    }
+    .program-card h3 {
+      font-family: var(--font2); font-size: 1.1rem; font-weight: 600;
+      margin-bottom: .6rem;
+    }
+    .program-card p { font-size: .88rem; color: var(--muted); line-height: 1.65; }
+
+    /* ─── Timeline ────────────────────────────────────────── */
+    #timeline { background: var(--bg2); }
+
+    .timeline {
+      max-width: 700px; margin: 0 auto;
+      position: relative;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 1.5rem; top: 0; bottom: 0;
+      width: 1px; background: linear-gradient(to bottom, var(--accent), var(--accent2), transparent);
+    }
+    .timeline-item {
+      display: flex; gap: 2rem; padding-bottom: 3rem;
+    }
+    .timeline-dot {
+      width: 3rem; height: 3rem; border-radius: 50%; flex-shrink: 0;
+      background: var(--bg2); border: 1px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .85rem; font-weight: 700; color: var(--accent);
+      position: relative; z-index: 1; margin-left: 0;
+    }
+    .timeline-body { padding-top: .4rem; }
+    .timeline-phase {
+      font-size: .72rem; color: var(--accent); font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: .3rem;
+    }
+    .timeline-title {
+      font-family: var(--font2); font-size: 1.05rem; font-weight: 600; margin-bottom: .5rem;
+    }
+    .timeline-desc { color: var(--muted); font-size: .88rem; line-height: 1.6; }
+
+    /* ─── Mentors ─────────────────────────────────────────── */
+    #mentors { }
+
+    .mentors-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.2rem;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    .mentor-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem 1rem;
+      text-align: center; transition: var(--transition);
+      position: relative; overflow: hidden;
+    }
+    .mentor-card:hover { border-color: rgba(255,255,255,.15); transform: translateY(-4px); }
+    .mentor-card:hover .mentor-overlay { opacity: 1; }
+
+    .mentor-avatar {
+      width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 1rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      border: 2px solid var(--border);
+    }
+    .mentor-name { font-weight: 600; font-size: .9rem; margin-bottom: .3rem; }
+    .mentor-role { color: var(--muted); font-size: .75rem; }
+
+    .mentor-overlay {
+      position: absolute; inset: 0;
+      background: var(--overlay-color, rgba(108,99,255,.15));
+      opacity: 0; transition: opacity var(--transition);
+      pointer-events: none;
+    }
+
+    /* ─── Facilities ──────────────────────────────────────── */
+    #facilities { background: var(--bg2); }
+
+    .facilities-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
+      max-width: 1100px; margin: 0 auto;
+    }
+
+    .facility-card {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--surface); display: flex; gap: 0;
+      transition: var(--transition); position: relative;
+    }
+    .facility-card:hover { border-color: rgba(255,255,255,.15); transform: translateY(-3px); }
+
+    .facility-icon-wrap {
+      padding: 2.5rem 2rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; flex-shrink: 0; width: 110px;
+      background: var(--icon-bg, rgba(108,99,255,.08));
+    }
+    .facility-text { padding: 2rem 2rem 2rem 0; }
+    .facility-text h3 { font-family: var(--font2); font-size: 1.05rem; font-weight: 600; margin-bottom: .5rem; }
+    .facility-text p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── FAQ ─────────────────────────────────────────────── */
+    #faq { }
+
+    .faq-list { max-width: 720px; margin: 0 auto; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 1rem;
+      overflow: hidden; transition: var(--transition);
+      background: var(--surface);
+    }
+    .faq-item.open { border-color: rgba(108,99,255,.4); }
+
+    .faq-question {
+      width: 100%; text-align: left; background: none; border: none;
+      padding: 1.4rem 1.8rem; cursor: pointer; color: var(--text);
+      font-family: var(--font); font-size: .95rem; font-weight: 500;
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .faq-question:hover { color: #fff; }
+
+    .faq-icon {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: transform var(--transition);
+      font-size: .75rem;
+    }
+    .faq-item.open .faq-icon { transform: rotate(45deg); background: var(--accent); border-color: var(--accent); }
+
+    .faq-answer {
+      max-height: 0; overflow: hidden; transition: max-height .4s cubic-bezier(.4,0,.2,1);
+    }
+    .faq-item.open .faq-answer { max-height: 300px; }
+    .faq-answer-inner { padding: 0 1.8rem 1.4rem; color: var(--muted); font-size: .9rem; line-height: 1.7; }
+
+    /* ─── CTA ─────────────────────────────────────────────── */
+    #cta {
+      background: var(--bg2); text-align: center;
+      padding: 8rem 3rem;
+    }
+    .cta-inner {
+      max-width: 680px; margin: 0 auto;
+      position: relative;
+    }
+    .cta-glow {
+      position: absolute; width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(108,99,255,.3), transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+    .cta-title {
+      font-family: var(--font2); font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700; line-height: 1.15; margin-bottom: 1.2rem;
+      letter-spacing: -.02em; position: relative;
+    }
+    .cta-desc { color: var(--muted); margin-bottom: 2.5rem; font-size: 1rem; position: relative; }
+    .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+
+    /* ─── Footer ──────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-family: var(--font2); font-weight: 700; font-size: 1.1rem;
+      color: var(--text); text-decoration: none;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-copy { color: var(--muted); font-size: .82rem; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); font-size: .82rem; text-decoration: none; transition: color var(--transition); }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ─── Reveal animations ───────────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .7s cubic-bezier(.4,0,.2,1), transform .7s cubic-bezier(.4,0,.2,1);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    /* ─── Responsive ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      section { padding: 5rem 1.5rem; }
+      #hero { padding: 7rem 1.5rem 4rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-visual { max-width: 320px; }
+      .program-grid { grid-template-columns: 1fr 1fr; }
+      .mentors-grid { grid-template-columns: repeat(3, 1fr); }
+      .facilities-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 2rem; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      nav.mobile-open .nav-links {
+        display: flex; flex-direction: column;
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(6,8,16,.97); backdrop-filter: blur(20px);
+        justify-content: center; align-items: center; gap: 2rem;
+        z-index: 99;
+      }
+      nav.mobile-open .nav-links a { font-size: 1.3rem; }
+      .program-grid { grid-template-columns: 1fr; }
+      .mentors-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-title { font-size: 2.5rem; }
+      .hero-stats { gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navigation ── -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">Bits <span>&</span> Atoms</a>
+    <ul class="nav-links">
+      <li><a href="#about">Nosotros</a></li>
+      <li><a href="#program">Programa</a></li>
+      <li><a href="#timeline">Currículo</a></li>
+      <li><a href="#mentors">Mentores</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="#cta" class="nav-cta">Aplicar</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section id="hero">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">Programa 2026 abierto</div>
+      <h1 class="hero-title">
+        Formamos a los<br />
+        líderes de la<br />
+        <span class="gradient">IA & el IoT</span>
+      </h1>
+      <p class="hero-subtitle">
+        Un programa de formación intensiva de 12 meses que combina teoría de vanguardia con prácticas reales en empresas tecnológicas. Costo cero para el estudiante.
+      </p>
+      <div class="hero-actions">
+        <a href="#cta" class="btn-primary">
+          Solicitar plaza
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#program" class="btn-secondary">
+          Conocer el programa
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Meses de formación</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0€</div>
+          <div class="stat-label">Coste para el alumno</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">10+</div>
+          <div class="stat-label">Mentores expertos</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Aprendizaje práctico</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section id="about">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-visual-inner">🧠</div>
+        <div class="about-badge-card">
+          <div class="about-badge-icon">⚡</div>
+          <div>
+            <div class="about-badge-text">Learning by doing</div>
+            <div class="about-badge-sub">Proyectos reales desde el día 1</div>
+          </div>
+        </div>
+      </div>
+      <div class="about-content reveal reveal-delay-1">
+        <div class="section-tag">Sobre nosotros</div>
+        <h2 class="section-title" style="text-align:left;margin-bottom:.8rem">Donde los bits<br/>se convierten en átomos</h2>
+        <p class="about-lead">Somos una plataforma educativa especializada en inteligencia artificial e IoT que transforma perfiles jóvenes en profesionales listos para la industria.</p>
+        <p class="about-body">Nuestra metodología combina instrucción teórica de vanguardia con prácticas reales en empresas tecnológicas patrocinadoras. Creemos que el talento no conoce fronteras: no importa tu formación previa, importa tu actitud.</p>
+        <div class="value-pills">
+          <span class="pill">🤖 Inteligencia Artificial</span>
+          <span class="pill">🌐 IoT</span>
+          <span class="pill">🔒 Ciberseguridad</span>
+          <span class="pill">📐 Fab Lab</span>
+          <span class="pill">🎯 Emprendimiento</span>
+          <span class="pill">🎬 Producción AV</span>
+          <span class="pill">🛒 Ecommerce</span>
+          <span class="pill">⛓️ Web 3.0</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Program ── -->
+  <section id="program">
+    <div class="section-header reveal">
+      <div class="section-tag">El programa</div>
+      <h2 class="section-title">Formación sin precedentes</h2>
+      <p class="section-desc">Un ecosistema de aprendizaje diseñado para que domines la tecnología que está transformando el mundo.</p>
+    </div>
+    <div class="program-grid">
+      <div class="program-card reveal" style="--card-glow:#6c63ff">
+        <div class="card-icon" style="--icon-bg:rgba(108,99,255,.12);background:rgba(108,99,255,.12)">🤖</div>
+        <h3>Inteligencia Artificial</h3>
+        <p>Machine Learning, modelos generativos, procesamiento del lenguaje natural y visión computacional. Aprende a construir y desplegar modelos reales.</p>
+      </div>
+      <div class="program-card reveal reveal-delay-1" style="--card-glow:#00d4aa">
+        <div class="card-icon" style="background:rgba(0,212,170,.12)">🌐</div>
+        <h3>Internet of Things</h3>
+        <p>Diseño de dispositivos conectados, sensórica, protocolos de comunicación, y desarrollo de sistemas edge-to-cloud escalables.</p>
+      </div>
+      <div class="program-card reveal reveal-delay-2" style="--card-glow:#ff6b6b">
+        <div class="card-icon" style="background:rgba(255,107,107,.12)">🔒</div>
+        <h3>Ciberseguridad</h3>
+        <p>Fundamentos de seguridad ofensiva y defensiva, auditorías, hardening de sistemas y protección de infraestructuras críticas conectadas.</p>
+      </div>
+      <div class="program-card reveal reveal-delay-1" style="--card-glow:#f59e0b">
+        <div class="card-icon" style="background:rgba(245,158,11,.12)">🚀</div>
+        <h3>Emprendimiento Tech</h3>
+        <p>Metodologías ágiles, lean startup, pitching a inversores, propiedad intelectual y creación de startups deeptech desde cero.</p>
+      </div>
+      <div class="program-card reveal reveal-delay-2" style="--card-glow:#ec4899">
+        <div class="card-icon" style="background:rgba(236,72,153,.12)">🎬</div>
+        <h3>Producción Digital</h3>
+        <p>Creación de contenido audiovisual, streaming, marketing digital, growth hacking y comunicación de proyectos tecnológicos.</p>
+      </div>
+      <div class="program-card reveal reveal-delay-3" style="--card-glow:#8b5cf6">
+        <div class="card-icon" style="background:rgba(139,92,246,.12)">⛓️</div>
+        <h3>Web 3.0 & Blockchain</h3>
+        <p>Contratos inteligentes, NFTs, DeFi, tokenización de activos físicos y la convergencia entre el mundo digital y el físico.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Timeline ── -->
+  <section id="timeline">
+    <div class="section-header reveal">
+      <div class="section-tag">Currículo</div>
+      <h2 class="section-title">12 meses, 4 fases</h2>
+      <p class="section-desc">Un recorrido estructurado desde los fundamentos hasta los proyectos de impacto real en empresas.</p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item reveal">
+        <div class="timeline-dot">Q1</div>
+        <div class="timeline-body">
+          <div class="timeline-phase">Meses 1 – 3</div>
+          <div class="timeline-title">Fundamentos & Mindset</div>
+          <div class="timeline-desc">Bases de programación, matemáticas para IA, metodologías ágiles, cultura maker. Se trabaja con Arduino, Raspberry Pi y primeros modelos de ML.</div>
+        </div>
+      </div>
+      <div class="timeline-item reveal reveal-delay-1">
+        <div class="timeline-dot">Q2</div>
+        <div class="timeline-body">
+          <div class="timeline-phase">Meses 4 – 6</div>
+          <div class="timeline-title">Especialización</div>
+          <div class="timeline-desc">Cada alumno elige su itinerario principal: IA/ML, IoT, ciberseguridad o producción digital. Proyectos de grupo con mentores de la industria.</div>
+        </div>
+      </div>
+      <div class="timeline-item reveal reveal-delay-2">
+        <div class="timeline-dot">Q3</div>
+        <div class="timeline-body">
+          <div class="timeline-phase">Meses 7 – 9</div>
+          <div class="timeline-title">Inmersión empresarial</div>
+          <div class="timeline-desc">Prácticas remuneradas en empresas patrocinadoras. El estudiante trabaja en proyectos reales bajo supervisión de ingenieros senior.</div>
+        </div>
+      </div>
+      <div class="timeline-item reveal reveal-delay-3">
+        <div class="timeline-dot">Q4</div>
+        <div class="timeline-body">
+          <div class="timeline-phase">Meses 10 – 12</div>
+          <div class="timeline-title">Proyecto Final & Demo Day</div>
+          <div class="timeline-desc">Desarrollo de un proyecto propio con potencial de mercado. Presentación ante inversores y empresas en el Demo Day de Bits & Atoms.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Mentors ── -->
+  <section id="mentors">
+    <div class="section-header reveal">
+      <div class="section-tag">Mentores</div>
+      <h2 class="section-title">Aprende de los mejores</h2>
+      <p class="section-desc">Profesionales activos en la industria que comparten su experiencia real, no teoría de manual.</p>
+    </div>
+    <div class="mentors-grid">
+      <div class="mentor-card reveal" style="--overlay-color:rgba(108,99,255,.15)">
+        <div class="mentor-avatar" style="background:rgba(108,99,255,.12)">👨‍💻</div>
+        <div class="mentor-name">Carlos R.</div>
+        <div class="mentor-role">IoT & Embedded Systems</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-1" style="--overlay-color:rgba(0,212,170,.15)">
+        <div class="mentor-avatar" style="background:rgba(0,212,170,.12)">👩‍🔬</div>
+        <div class="mentor-name">Ana M.</div>
+        <div class="mentor-role">Machine Learning</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-2" style="--overlay-color:rgba(255,107,107,.15)">
+        <div class="mentor-avatar" style="background:rgba(255,107,107,.12)">🧑‍💼</div>
+        <div class="mentor-name">Javier P.</div>
+        <div class="mentor-role">Emprendimiento</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-3" style="--overlay-color:rgba(245,158,11,.15)">
+        <div class="mentor-avatar" style="background:rgba(245,158,11,.12)">👩‍🎨</div>
+        <div class="mentor-name">Lucía F.</div>
+        <div class="mentor-role">Creatividad & Diseño</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-1" style="--overlay-color:rgba(139,92,246,.15)">
+        <div class="mentor-avatar" style="background:rgba(139,92,246,.12)">🧑‍💻</div>
+        <div class="mentor-name">Marcos T.</div>
+        <div class="mentor-role">Ciberseguridad</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-2" style="--overlay-color:rgba(236,72,153,.15)">
+        <div class="mentor-avatar" style="background:rgba(236,72,153,.12)">👩‍💻</div>
+        <div class="mentor-name">Sara V.</div>
+        <div class="mentor-role">Web 3.0</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-3" style="--overlay-color:rgba(108,99,255,.15)">
+        <div class="mentor-avatar" style="background:rgba(108,99,255,.12)">🧑‍🎬</div>
+        <div class="mentor-name">Diego L.</div>
+        <div class="mentor-role">Producción Audiovisual</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal" style="--overlay-color:rgba(0,212,170,.15)">
+        <div class="mentor-avatar" style="background:rgba(0,212,170,.12)">👩‍⚖️</div>
+        <div class="mentor-name">Elena S.</div>
+        <div class="mentor-role">Propiedad Intelectual</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-1" style="--overlay-color:rgba(255,107,107,.15)">
+        <div class="mentor-avatar" style="background:rgba(255,107,107,.12)">👨‍🛒</div>
+        <div class="mentor-name">Roberto N.</div>
+        <div class="mentor-role">Ecommerce & Marketing</div>
+        <div class="mentor-overlay"></div>
+      </div>
+      <div class="mentor-card reveal reveal-delay-2" style="--overlay-color:rgba(245,158,11,.15)">
+        <div class="mentor-avatar" style="background:rgba(245,158,11,.12)">👩‍📡</div>
+        <div class="mentor-name">Paula G.</div>
+        <div class="mentor-role">Streaming & Media</div>
+        <div class="mentor-overlay"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Facilities ── -->
+  <section id="facilities">
+    <div class="section-header reveal">
+      <div class="section-tag">Instalaciones</div>
+      <h2 class="section-title">Espacios para crear</h2>
+      <p class="section-desc">Acceso a laboratorios y talleres de última generación donde las ideas toman forma física.</p>
+    </div>
+    <div class="facilities-grid">
+      <div class="facility-card reveal">
+        <div class="facility-icon-wrap" style="--icon-bg:rgba(108,99,255,.08);background:rgba(108,99,255,.08)">🏭</div>
+        <div class="facility-text">
+          <h3>Fab Lab</h3>
+          <p>Fabricación digital de prototipos: cortadoras láser, plotters de vinilo y fresadoras CNC para materializar cualquier diseño.</p>
+        </div>
+      </div>
+      <div class="facility-card reveal reveal-delay-1">
+        <div class="facility-icon-wrap" style="background:rgba(0,212,170,.08)">⚙️</div>
+        <div class="facility-text">
+          <h3>Taller de Mecatrónica</h3>
+          <p>Electrónica, robótica y sistemas embebidos. Equipado con osciloscopios, soldadoras, módulos y kits de desarrollo profesionales.</p>
+        </div>
+      </div>
+      <div class="facility-card reveal reveal-delay-2">
+        <div class="facility-icon-wrap" style="background:rgba(255,107,107,.08)">🖨️</div>
+        <div class="facility-text">
+          <h3>Sala de Impresión 3D</h3>
+          <p>Impresoras FDM y resina de última generación para prototipado rápido de piezas, wearables y carcasas para dispositivos IoT.</p>
+        </div>
+      </div>
+      <div class="facility-card reveal reveal-delay-3">
+        <div class="facility-icon-wrap" style="background:rgba(236,72,153,.08)">🎬</div>
+        <div class="facility-text">
+          <h3>Estudio Audiovisual</h3>
+          <p>Estudio profesional con iluminación, croma, cámaras 4K y equipos de edición para producción de contenido y streaming en directo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section id="faq">
+    <div class="section-header reveal">
+      <div class="section-tag">Preguntas frecuentes</div>
+      <h2 class="section-title">Todo lo que necesitas saber</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          ¿El programa es realmente gratuito para el alumno?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Sí. Los costes del programa son íntegramente financiados por las empresas patrocinadoras que participan en el ecosistema Bits & Atoms a cambio de acceso prioritario al talento formado. El alumno no paga nada.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question">
+          ¿Necesito experiencia previa en programación?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">No es obligatorio. Buscamos perfiles con actitud, curiosidad y ganas de aprender. En el primer trimestre cubrimos los fundamentos necesarios para cualquier itinerario. Sí valoramos habilidades previas en matemáticas, lógica o cualquier disciplina técnica.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-2">
+        <button class="faq-question">
+          ¿Qué tipo de perfiles buscan?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Buscamos perfiles multidisciplinares: técnicos, creativos y de gestión. El programa está diseñado para personas jóvenes con hambre de aprender, no para expertos. La diversidad de perfiles enriquece el ecosistema.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-3">
+        <button class="faq-question">
+          ¿Qué pasa al terminar el programa?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Los egresados tienen acceso a nuestra red de empresas patrocinadoras para incorporación directa, o pueden presentar su proyecto en el Demo Day para buscar inversión. Además, pasan a formar parte de la comunidad alumni de por vida.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          ¿Cuántas plazas hay disponibles?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">Cada edición cuenta con un número limitado de plazas para garantizar una atención personalizada y una alta calidad de formación. Te recomendamos enviar tu solicitud cuanto antes.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section id="cta">
+    <div class="cta-inner reveal">
+      <div class="cta-glow"></div>
+      <h2 class="cta-title">¿Listo para dar el salto?</h2>
+      <p class="cta-desc">Únete a la próxima generación de creadores de tecnología. Las plazas son limitadas.</p>
+      <div class="cta-actions">
+        <a href="#" class="btn-primary">
+          Solicitar mi plaza
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#about" class="btn-secondary">Saber más</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <a href="#" class="footer-logo">Bits <span>&</span> Atoms</a>
+    <p class="footer-copy">© 2026 Bits & Atoms. Todos los derechos reservados.</p>
+    <div class="footer-links">
+      <a href="#">Privacidad</a>
+      <a href="#">Términos</a>
+      <a href="#">Contacto</a>
+    </div>
+  </footer>
+
+  <!-- ── JavaScript ── -->
+  <script>
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    });
+
+    // Hamburger
+    const hamburger = document.getElementById('hamburger');
+    hamburger.addEventListener('click', () => {
+      nav.classList.toggle('mobile-open');
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => nav.classList.remove('mobile-open'));
+    });
+
+    // Scroll reveal
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // FAQ accordion
+    document.querySelectorAll('.faq-question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.parentElement;
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!isOpen) item.classList.add('open');
+      });
+    });
+
+    // Card glow on mouse move
+    document.querySelectorAll('.program-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        card.style.setProperty('--mx', x + '%');
+        card.style.setProperty('--my', y + '%');
+      });
+    });
+
+    // Smooth number counter for stats
+    const animateCounter = (el, target, suffix = '') => {
+      let start = 0;
+      const duration = 1500;
+      const step = timestamp => {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+
+    const statsObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          const raw = el.textContent;
+          if (raw.includes('%')) animateCounter(el, parseInt(raw), '%');
+          else if (raw.includes('€')) animateCounter(el, 0, '€');
+          else if (raw.includes('+')) animateCounter(el, parseInt(raw), '+');
+          else animateCounter(el, parseInt(raw));
+          statsObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-num').forEach(el => statsObserver.observe(el));
+  </script>
+</body>
+</html>
