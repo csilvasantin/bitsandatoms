@@ -495,6 +495,53 @@
     .footer-links a { color: var(--muted); font-size: .82rem; text-decoration: none; transition: color var(--transition); }
     .footer-links a:hover { color: var(--text); }
 
+    /* ─── FAQ Category ───────────────────────────────────── */
+    .faq-category {
+      font-size: .72rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      padding: 1.5rem 0 .5rem; margin-bottom: .25rem;
+    }
+    .faq-category:first-child { padding-top: 0; }
+
+    /* ─── Original Site embed ─────────────────────────────── */
+    #web-original { padding: 5rem 3rem; background: var(--bg2); }
+
+    .site-embed-wrapper {
+      max-width: 1100px; margin: 0 auto;
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 60px rgba(108,99,255,.15);
+    }
+    .site-embed-bar {
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid var(--border);
+      padding: .7rem 1.2rem;
+      display: flex; align-items: center; gap: .8rem;
+    }
+    .site-embed-dots { display: flex; gap: .4rem; }
+    .site-embed-dot {
+      width: 12px; height: 12px; border-radius: 50%; display: inline-block;
+    }
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #febc2e; }
+    .dot-green { background: #28c840; }
+    .site-embed-url {
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      border-radius: 6px; padding: .2rem 1rem;
+      font-size: .78rem; color: var(--muted);
+      flex: 1; max-width: 360px;
+    }
+    .site-embed-link {
+      color: var(--muted); font-size: .78rem;
+      text-decoration: none; margin-left: auto;
+      transition: color var(--transition);
+    }
+    .site-embed-link:hover { color: var(--text); }
+    .site-embed-iframe {
+      width: 100%; height: 700px;
+      border: none; display: block; background: #fff;
+    }
+
     /* ─── Reveal animations ───────────────────────────────── */
     .reveal {
       opacity: 0; transform: translateY(30px);
@@ -836,51 +883,114 @@
       <h2 class="section-title">Todo lo que necesitas saber</h2>
     </div>
     <div class="faq-list">
+
+      <div class="faq-category reveal">Sobre Bits and Atoms</div>
+
       <div class="faq-item reveal">
         <button class="faq-question">
-          ¿El programa es realmente gratuito para el alumno?
+          ¿Qué diferencia a Bits and Atoms de otros centros educativos en IA e IoT?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">Sí. Los costes del programa son íntegramente financiados por las empresas patrocinadoras que participan en el ecosistema Bits & Atoms a cambio de acceso prioritario al talento formado. El alumno no paga nada.</div>
+          <div class="faq-answer-inner">Bits and Atoms se destaca por su enfoque de aprendizaje experiencial <em>"learning by doing"</em> y su estrecha colaboración con la industria. Además, cuenta con el respaldo de importantes empresas del sector tecnológico, proporcionando a los alumnos un contacto directo con el mundo profesional desde el primer día.</div>
         </div>
       </div>
       <div class="faq-item reveal reveal-delay-1">
         <button class="faq-question">
-          ¿Necesito experiencia previa en programación?
+          ¿Bits and Atoms cuenta con instalaciones para proyectos prácticos?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">No es obligatorio. Buscamos perfiles con actitud, curiosidad y ganas de aprender. En el primer trimestre cubrimos los fundamentos necesarios para cualquier itinerario. Sí valoramos habilidades previas en matemáticas, lógica o cualquier disciplina técnica.</div>
+          <div class="faq-answer-inner">Sí. Bits and Atoms cuenta con un Fab Lab, un taller de mecatrónica, sala de impresión 3D y un estudio de producción audiovisual, diseñados específicamente para el desarrollo de proyectos prácticos e innovadores.</div>
+        </div>
+      </div>
+
+      <div class="faq-category reveal">Programa de formación</div>
+
+      <div class="faq-item reveal">
+        <button class="faq-question">
+          ¿Cuánto tiempo dura el programa de formación?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">El programa está ideado para tener una duración de 1 año donde se realiza la parte teórica y la parte práctica, tanto en las instalaciones de Bits and Atoms como en empresas asociadas.</div>
+        </div>
+      </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question">
+          ¿Cuánto cuesta el programa de formación?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">El programa puede llegar a ser completamente gratuito para los estudiantes, ya que los gastos son cubiertos por las empresas patrocinadoras del ecosistema.</div>
         </div>
       </div>
       <div class="faq-item reveal reveal-delay-2">
         <button class="faq-question">
-          ¿Qué tipo de perfiles buscan?
+          ¿Cuáles son las áreas de especialización?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">Buscamos perfiles multidisciplinares: técnicos, creativos y de gestión. El programa está diseñado para personas jóvenes con hambre de aprender, no para expertos. La diversidad de perfiles enriquece el ecosistema.</div>
+          <div class="faq-answer-inner">En Bits and Atoms nos especializamos en Inteligencia Artificial e IoT, ofreciendo programas de formación profundos en ambas áreas y sus intersecciones: ciberseguridad, web 3.0, producción audiovisual, ecommerce y emprendimiento tecnológico.</div>
         </div>
       </div>
       <div class="faq-item reveal reveal-delay-3">
         <button class="faq-question">
-          ¿Qué pasa al terminar el programa?
+          ¿Cómo se organiza la formación teórica y las prácticas?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">Los egresados tienen acceso a nuestra red de empresas patrocinadoras para incorporación directa, o pueden presentar su proyecto en el Demo Day para buscar inversión. Además, pasan a formar parte de la comunidad alumni de por vida.</div>
+          <div class="faq-answer-inner">Los estudiantes reciben formación teórica por las mañanas en las instalaciones de Bits and Atoms y realizan prácticas en empresas patrocinadoras por las tardes. Una jornada completa de aprendizaje real.</div>
         </div>
       </div>
+
+      <div class="faq-category reveal">Proceso de selección</div>
+
       <div class="faq-item reveal">
         <button class="faq-question">
-          ¿Cuántas plazas hay disponibles?
+          ¿Cuál es el proceso de selección de alumnos?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-answer">
-          <div class="faq-answer-inner">Cada edición cuenta con un número limitado de plazas para garantizar una atención personalizada y una alta calidad de formación. Te recomendamos enviar tu solicitud cuanto antes.</div>
+          <div class="faq-answer-inner">El proceso comienza con el envío de un formulario de solicitud. Los candidatos seleccionados son invitados a entrevistas presenciales donde se evalúa su idoneidad, motivación y aptitudes para el programa.</div>
         </div>
       </div>
+      <div class="faq-item reveal reveal-delay-1">
+        <button class="faq-question">
+          ¿Qué perfil de alumno encaja en Bits and Atoms?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">En este proyecto son bienvenidos perfiles muy diversos y multidisciplinarios: técnicos, creativos y de gestión. Si no tienes mucha experiencia pero sí muchas ganas de aprender, este programa es para ti.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── Web original ── -->
+  <section id="web-original">
+    <div class="section-header reveal">
+      <div class="section-tag">Web oficial</div>
+      <h2 class="section-title">Conoce el sitio original</h2>
+      <p class="section-desc">Visita <strong>bitsandatoms.ai</strong> para más información sobre el programa.</p>
+    </div>
+    <div class="site-embed-wrapper reveal">
+      <div class="site-embed-bar">
+        <div class="site-embed-dots">
+          <span class="site-embed-dot dot-red"></span>
+          <span class="site-embed-dot dot-yellow"></span>
+          <span class="site-embed-dot dot-green"></span>
+        </div>
+        <span class="site-embed-url">www.bitsandatoms.ai</span>
+        <a href="https://www.bitsandatoms.ai" target="_blank" rel="noopener" class="site-embed-link">Abrir en nueva pestaña ↗</a>
+      </div>
+      <iframe
+        src="https://www.bitsandatoms.ai"
+        title="Bits and Atoms - Sitio oficial"
+        class="site-embed-iframe"
+        loading="lazy"
+      ></iframe>
     </div>
   </section>
 
